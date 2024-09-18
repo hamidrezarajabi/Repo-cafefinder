@@ -1,0 +1,153 @@
+﻿@page "/Cafe-Panel/{id}"
+@inject ApplicationDbContext db
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+
+
+
+<h3>Cafe_Panel</h3>
+
+
+<table>
+    <tr>
+
+        <th>شماره میز </th>
+        <th>روز رزرو </th>
+        <th>ساعت رزرو</th>
+        <th>نام رزرو کننده</th>
+        <th>شماره تماس</th>
+        <th>تعداد نفرات</th>
+        <th>خالی کردن رزرو</th>
+        <th>حذف کامل میز</th>
+    </tr>
+    @foreach (var item in User!.Rezerv!)
+    {
+        var _key = item.Key.Split("'''");
+        var _value = item.Value.Split("'''");
+        <tr>
+            <td>@_key[0]</td>
+            <td>@_key[1]</td>
+            <td>@_value[0]</td>
+            <td>@_value[1]</td>
+            <td>@_value[2]</td>
+            <td>@_value[3]</td>
+            
+            <td><button type="submit" @onclick="()=>{User.Rezerv.Remove(item.Key);db.Users.Update(User); db.SaveChanges();}">خالی کردن تایم</button></td>
+        </tr>
+    }
+</table>
+
+<table>
+    <tr>
+        <th>میز</th>
+        <th>حذف میز</th>
+    </tr>
+     
+    @foreach (var item in User.SelectRezerv!)
+    {
+        <tr>
+            <td>@item</td>
+            <td><button type="submit" @onclick="()=>{User.SelectRezerv?.Remove(item);db.Users.Update(User); db.SaveChanges();}">حذف میز</button> </td>
+        </tr>
+    }
+
+
+
+</table>
+
+
+
+
+
+<table>
+    <tr>
+        <th>نام کاربری</th>
+        <th>نظر</th>
+        <th>امتیاز</th>
+        <th>تایید نظر</th>
+    </tr>
+    @foreach (var item in User!.StarRating!)
+    {
+
+        <tr>
+            <td>@item.Key</td>
+            <td>@item.Value.Key</td>
+            <td>@((item.Value.Value > 0) ? item.Value.Value : -item.Value.Value)</td>
+            <td>
+                <button @onclick="()=>{var c = User?.StarRating?[item.Key];
+        User!.StarRating![(item.Key)] = new KeyValuePair<string, float>(c?.Key!, -c?.Value ?? 0f);
+        db.Users.Update(User!);
+        db.SaveChanges();}">
+
+
+                    @{
+                        if (item.Value.Value < 0)
+                        {
+                            <p>
+                                تایید نظر
+                            </p>
+                        }
+                        else
+                        {
+                            <p>
+                            حذف نظر
+                            </p>
+                        }
+                    }
+
+                </button>
+            </td>
+
+
+
+        </tr>
+    }
+
+
+
+
+</table>
+
+
+<h1>اضافه کردن تایم</h1>
+<input  @bind="Table" type="text" name="addTime" />
+<button type="submit" @onclick="SubmitComment">اضافه کردن تایم</button>
+
+
+
+@code {
+    [Parameter]
+    public required string id { get; set; }
+
+    private ApplicationUser? User { get; set; }
+    private ApplicationUser? user { get; set; }
+    public string Table;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var name = user.Identity?.Name;
+        this.user = db.Users.FirstOrDefault(p => p.UserName == name); // مثال برای گرفتن داده‌های یک مکان
+        User = db.Users.FirstOrDefault(p => p.Id == id); // مثال برای گرفتن داده‌های یک مکان
+        if (user.Identity!.IsAuthenticated==false || !(this.user!.UserName== User!.UserName)&& this.user.Rule!= Rule.Admin)
+            NavigationManager.NavigateTo(NavigationManager.BaseUri+"Account/Login/");
+
+        await Task.CompletedTask;
+    }
+
+    private void SubmitComment()
+    {
+
+        User?.SelectRezerv?.Add(Table);
+        db.Users.Update(User!);
+        db.SaveChanges();
+        Table = "";
+    }
+
+
+
+}

@@ -1,0 +1,222 @@
+﻿@page "/details/{id}"
+@inject ApplicationDbContext db
+@rendermode InteractiveServer
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+@inject NavigationManager NavigationManage
+<h3>details</h3>
+
+<main>
+    @if (User!.FoodAndDrink)
+    {
+        <h1 class="cafe-name">کافه رستوران</h1>
+    }
+    else
+    {
+        @if (User!.Restaurant)
+        {
+            <h1 class="cafe-name">رستوران</h1>
+        }
+        else
+        {
+            <h1 class="cafe-name">کافه</h1>
+        }
+    }
+</main>
+
+<div class="container-resturent">
+    <div class="info-gallery-cafe">
+        <div class="info-cafe">
+            <h2>@User.Name</h2>
+            <p>آدرس: @User.Addres</p>
+            <p>ساعت کار: @User.WorkTime</p>
+            <button>
+                <a href="#">لوکیشن</a>
+            </button>
+            <button>
+                <a href="#">منو</a>
+            </button>
+        </div>
+        <div class="gallery-cafe">
+            <h2>گالری تصاویر</h2>
+            <div class="gallery-images-cafe">
+                @foreach (var item in User!.Photo!)
+                {
+                    <img src="data:image/png;base64,@item.Value" />
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="comments-form">
+        <div class="comments">
+            <h2>نظرات مشتریان</h2>
+            @foreach (var item in User!.StarRating!)
+            {
+                if (item.Value.Value >= 0)
+                {
+                    <p>@item.Value: @item.Key</p>
+                }
+
+            }
+        </div>
+
+        <div class="form">
+            <h2>نظر خود را ثبت کنید</h2>
+            @if (masseag != string.Empty)
+            {
+                <p>@masseag</p>
+            }
+            <textarea @bind="NewCommentText" placeholder="نظر شما" required></textarea>
+            <label for="rating">امتیاز:</label>
+            <select @bind="SelectedRating" required>
+                <option value="5">5 ستاره</option>
+                <option value="4">4 ستاره</option>
+                <option value="3">3 ستاره</option>
+                <option value="2">2 ستاره</option>
+                <option value="1">1 ستاره</option>
+            </select>
+            <button @onclick="SubmitComment">ثبت نظر</button>
+        </div>
+    </div>
+
+    @if (IsLogin == true)
+    {
+        <a href="/edit/@User.Id">
+            <button>ادیت</button>
+        </a>
+    }
+</div>
+
+<div class="form">
+    <h2>اطلاعات خود را وارد نمایید</h2>
+    @if (masseag2 != string.Empty)
+    {
+        <p>@masseag2</p>
+    }
+    <input type="hidden" value="@User.Id" />
+    <label for="name">نام و نام خانوادگی خود را وارد نمایید</label>
+    <input type="text" @bind="ReservationName" id="name" />
+    <label for="phone-number">شماره تلفن خود را وارد نمایید</label>
+    <input type="tel" @bind="ReservationPhone" id="phone-number" />
+    <select @bind="ReservationDay" id="rezervTime">
+        <option value="">روز مورد نظر را انتخاب کنید</option>
+
+        @foreach (var item in dayfortable)
+        {
+
+            <option value="@item">@item</option>
+        }
+    </select>
+
+    
+    <select @bind="ReservationTime" id="rezervTime">
+        <option value="">ساعت مورد نظر را انتخاب کنید</option>
+
+        @foreach (var item in timefortable)
+        {
+
+            <option value="@item">@item</option>
+        }
+    </select>
+
+
+    
+    <select @bind="ReservationTable" id="rezervTime">
+        <option value="">لطفا میز خود را انتخاب کنید</option>
+
+        @foreach (var item in rezerv)
+        {
+
+            <option value="@item">@item</option>
+        }
+        </select>
+
+    <label for="people-number">تعداد نفرات خود را بنویسید</label>
+    <input type="number" @bind="ReservationCount" id="people-number" />
+    <button @onclick="SubmitRezarv" class="btn btn-danger">ثبت رزرو</button>
+</div>
+
+<footer>
+    <p>تمامی حقوق محفوظ است. © 2024</p>
+</footer>
+
+@code {
+    [Parameter]
+    public required string id { get; set; }
+    public ApplicationUser? User { get; set; }
+    public ApplicationUser? user { get; set; }
+    public bool IsLogin { get; set; } = false;
+    public string? NewCommentText { get; set; }
+    public int SelectedRating { get; set; } = 3;
+    public string? ReservationName { get; set; }
+    public string? ReservationPhone { get; set; }
+    public string? ReservationDay { get; set; }
+    public string? ReservationTime { get; set; }
+    public string? ReservationTable { get; set; }
+    public int ReservationCount { get; set; }
+    public string masseag = string.Empty;
+    public string masseag2 = string.Empty;
+    public int comentcount = 0;
+    public List<string> rezerv { get; set; } = new();
+    public List<string> dayfortable { get; set; } = new()
+    {
+        "شنبه",  "یک شنبه",  "دو شنبه",  "سه شنبه ",  "چهارشنبه",  "پنج شنبه","جمعه"
+    };
+    public List<string> timefortable { get; set; } = new(){
+        "8-10",  "10-12",  "12-14",  "14-16 ",  "16-18",  "18-20","20-22", "22-24"
+    };
+
+    protected override async void OnInitialized()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var name = user.Identity?.Name;
+
+        this.user = db.Users.FirstOrDefault(p => p.UserName == name); // مثال برای گرفتن داده‌های یک مکان
+        User = db.Users.FirstOrDefault(p => p.Id == id); // مثال برای گرفتن داده‌های یک مکان
+        if (User is null)
+            NavigationManage.NavigateTo("");
+
+        if (this.user is not null) { IsLogin = true; }
+        rezerv = User.SelectRezerv!.Except(User.Rezerv!.Keys.ToList()).ToList();
+
+        await Task.CompletedTask;
+    }
+
+    private void SubmitComment()
+    {
+        comentcount++;
+        if (comentcount > 5) { masseag = "!!!اون کلید لامصب رو یک بار بزن"; return; }
+        if (user is null) { masseag = "برای ثبت نظر ابتدا باید لاگین کنید"; return; }
+        if (!User!.StarRating!.TryAdd(user!.UserName!, new KeyValuePair<string, float>(NewCommentText!, -(float)(SelectedRating))))
+        {
+            masseag = "شما قبلا نظر خود را ثبت کرده اید";
+            return;
+        }
+
+        db.Users.Update(User!);
+        db.SaveChanges();
+        // اینجا کد ارسال نظر اضافه می‌شود
+    }
+
+    public void SubmitRezarv()
+    {
+        if (user is null) { masseag2 = "برای ثبت نظر ابتدا باید لاگین کنید"; return; }
+        if (string.IsNullOrWhiteSpace(ReservationTable)) { masseag2 = "لطفا میز مورد نظر خود را انتخاب کنید"; return; }
+        if (ReservationCount== 0) { masseag2 = "تعداد نفرات خود را وارد نمایید"; return; }
+        if (ReservationName is null) { masseag2 = "لطفا نام خود را وارد نمایید"; return; }
+        if (ReservationPhone is null) { masseag2 = "لطفا شماره تماس خود را وارد نمایید"; return; }
+        if (dayfortable is null) { masseag2 = "لطفا روز خود را وارد نمایید"; return; }
+        if (!User!.Rezerv!.TryAdd($"{ReservationTable}'''{ReservationDay}'''{ReservationTime}", user!.UserName! + "'''" + ReservationName + "'''" + ReservationPhone + "'''" + ReservationCount))
+        {
+            masseag2 = "این مشخصات رزرو شده است";
+            return;
+        }
+        rezerv.Remove(ReservationTable!);
+        db.Users.Update(User);
+        db.SaveChanges();
+        NavigationManage.NavigateTo("SubmitRezerv");
+        // اینجا کد ثبت رزرو اضافه می‌شود
+    }
+}
+

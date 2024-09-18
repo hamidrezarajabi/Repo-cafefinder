@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35222.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cafefinder2", "cafefinder2\cafefinder2\cafefinder2.csproj", "{D8FD1AA3-B03F-4042-AAA4-869D38AA69DD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cafefinder2.Client", "cafefinder2\cafefinder2.Client\cafefinder2.Client.csproj", "{B1A8F38E-EECC-4C3D-82EB-48077BCCB32E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cafefinder2.AppHost", "cafefinder2.AppHost\cafefinder2.AppHost.csproj", "{D8AAA2E5-CB03-4522-9A16-9FE48001D365}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cafefinder2.ServiceDefaults", "cafefinder2.ServiceDefaults\cafefinder2.ServiceDefaults.csproj", "{20199847-85C4-430F-803A-27071A585DB4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D8FD1AA3-B03F-4042-AAA4-869D38AA69DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8FD1AA3-B03F-4042-AAA4-869D38AA69DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8FD1AA3-B03F-4042-AAA4-869D38AA69DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8FD1AA3-B03F-4042-AAA4-869D38AA69DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1A8F38E-EECC-4C3D-82EB-48077BCCB32E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1A8F38E-EECC-4C3D-82EB-48077BCCB32E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1A8F38E-EECC-4C3D-82EB-48077BCCB32E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1A8F38E-EECC-4C3D-82EB-48077BCCB32E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8AAA2E5-CB03-4522-9A16-9FE48001D365}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8AAA2E5-CB03-4522-9A16-9FE48001D365}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8AAA2E5-CB03-4522-9A16-9FE48001D365}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8AAA2E5-CB03-4522-9A16-9FE48001D365}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20199847-85C4-430F-803A-27071A585DB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20199847-85C4-430F-803A-27071A585DB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20199847-85C4-430F-803A-27071A585DB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20199847-85C4-430F-803A-27071A585DB4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {47FFA5F8-AF10-4603-BCB0-47C4614ABA84}
+	EndGlobalSection
+EndGlobal

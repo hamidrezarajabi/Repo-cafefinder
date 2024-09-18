@@ -1,0 +1,104 @@
+﻿@page "/Panel/{id}"
+@inject ApplicationDbContext db
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+
+
+
+<section class="content">
+    <div class="stats-container">
+        <div class="stat-item">
+            <h1>Analytics</h1>
+        </div>
+        <div class="analytics-container">
+            <div class="analytics-item">
+                <h2>Total Restaurants</h2>
+                <p class="count">@db.Users.Where(p=>p.Restaurant).Count()</p>
+            </div>
+
+            <div class="analytics-item">
+                <h2>Total Cafes</h2>
+                <p class="count">@db.Users.Where(p=>p.Cafe).Count()</p>
+            </div>
+
+            <div class="logout">
+                <button class="custom-btn logout-btn">
+                    <span>افزودن</span>
+                </button>
+            </div>
+
+            <div>
+                <p>@User?.UserName</p>
+                <p>@TimeOnly.FromDateTime(DateTime.Now)</p>
+            </div>
+
+            <div class="logout">
+                <form method="post">
+                    <button type="submit" asp-page-handler="Logout" class="custom-btn logout-btn">
+                        <span>خروج</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="left-content">
+        <div class="picture">
+            <img class="pic-header" src="header-pic.png" alt="Header Image">
+        </div>
+
+        <div class="cards-container">
+            @foreach (var all in db.Users.Where(p=>p.Rule== Rule.cafe_admin))
+            {
+                <div class="card">
+                    <img src="data:image/png;base64,@all.Photo.FirstOrDefault().Value" alt="Event Image" />
+                    <div class="card-content">
+                        <h3 class="card-title">@all.Name</h3>
+                        <p class="card-location">@all.Neaber</p>
+
+                        @{
+                            float star = 0;
+                            foreach (var _star in all.StarRating?.Where(p=>p.Value.Value>0).Select(prop => prop.Value.Value)!)
+                                star += _star;
+                            star = star / all.StarRating.Count;
+                            if (float.IsNaN(star)) { star = 0; }
+                        }
+                        <div class="card-actions">
+                            <span class="tag">@star</span>
+                            <a href="./Details/@all.Id" class="cafe-link" >مشاهده</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+
+
+<h3>Panel</h3>
+
+@code {
+    [Parameter]
+    public required string id { get; set; }
+
+    private ApplicationUser? User { get; set; }
+    private ApplicationUser? user { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var name = user.Identity?.Name;
+        this.user = db.Users.FirstOrDefault(p => p.UserName == name); // مثال برای گرفتن داده‌های یک مکان
+        User = db.Users.FirstOrDefault(p => p.Id == id); // مثال برای گرفتن داده‌های یک مکان
+        if (user.Identity!.IsAuthenticated == false || this.user!.Rule != Rule.Admin)
+            NavigationManager.NavigateTo(NavigationManager.BaseUri + "Account/Login/");
+
+        await Task.CompletedTask;
+    }
+
+
+
+}

@@ -1,0 +1,161 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@inject ApplicationDbContext db
+@{
+}
+
+<PageTitle>Home</PageTitle>
+
+
+<section class="main">
+    <div class="main-text">
+        <h1>بهترین ها را راحت انتخاب کنید</h1>
+        <p class="subtitle">همراه شما تا بهترین انتخاب</p>
+    </div>
+    @*  <form action="search" method="GET" class="search-form">
+    <div class="input-wrapper">
+    <input type="text" name="s" placeholder="نام کافی‌شاپ یا رستوران">
+    <button type="submit" class="search-btn">
+    <i class="fas fa-search"></i> <!-- آیکون جستجو -->
+    </button>
+    </div>
+    </form> *@
+    <input type="type" name="name" @bind-value="name"  />
+
+    @foreach (var r in Users.Where(p =>
+    {
+       if (!string.IsNullOrWhiteSpace(name)) return p.Name.Contains(name);
+       else return false;
+    }))
+    {
+        @r.Name
+        <br />
+    }
+
+    <div class="show-all">
+        <button type="button" class="custom-btn show-btn" onclick="window.location.href='/all';">
+            نمایش همه
+        </button>
+    </div>
+
+
+</section>
+<div class="text-center">
+    <p>برترین های هفته</p>
+</div>
+<div class="products">
+
+    @foreach (var top in Users)
+    {
+        <div class="product-item">
+            
+                <img src="data:image/png;base64,@top.Photo?.FirstOrDefault().Value
+                " />
+            
+            <h3>@top.Name</h3>
+            <p>@top.Neaber</p>
+
+            @{
+                float star = 0;
+                foreach (var _star in top.StarRating?.Select(prop => prop.Value.Value).Where(predicate => predicate > 0)!)
+                    star += _star;
+                star = star / top.StarRating.Count;
+                if (float.IsNaN(star)) { star = 0; }
+            }  <div class="rating">@star امتیاز</div>
+            <div class="show-cafe">
+                <button type="button" class="cafe-show-btn">
+                    <a href="./Details/@top.Id" class="cafe-link">مشاهده</a>
+                </button>
+            </div>
+        </div>
+
+
+
+    }
+
+
+
+
+</div>
+<section>
+    <h2>برترین محله ها</h2>
+    <div class="neighborhoods">
+
+        @foreach (var item in Users.DistinctBy(prop => prop.Neaber))
+        {
+
+            <div class="neighborhoods">
+                <a asp-page="./Index" asp-route-n="@item" class="neighborhoods-btn">
+                    <button @onclick="()=>{naber=item.Neaber;}">
+                        @item.Neaber
+                    </button>
+                </a>
+            </div>
+
+
+        }
+
+
+
+    </div>
+</section>
+
+<div class="products">
+
+
+    @if (!string.IsNullOrWhiteSpace(naber))
+    { 
+    @foreach (var top in Users.Where(p=>p.Neaber== naber) )
+    {
+        <div class="product-item">
+            <img src="data:image/png;base64,@top.Photo?.FirstOrDefault().Value" />
+            <h3>@top.Name</h3>
+            <p>@top.Neaber</p>
+
+            @{
+                float star = 0;
+                foreach (var _star in top.StarRating?.Select(prop => prop.Value.Value).Where(predicate=>predicate>0)!)
+                    star += _star;
+                star = star / top.StarRating.Count;
+                if (float.IsNaN(star)) { star = 0; }
+            }
+            <div class="rating">@star امتیاز</div>
+            <div class="show-cafe">
+
+                    <a href="./Details/@top.Id" class="cafe-link">
+                        <button type="button" class="cafe-show-btn">           مشاهده     </button>
+                        
+                    </a>
+            </div>
+        </div>
+
+        }
+
+    }
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+@code
+{
+
+    string naber = string.Empty;
+    List<ApplicationUser> Users;
+    protected override async Task OnInitializedAsync()
+    {
+        Users = db.Users.Where(p => p.Rule == Rule.cafe_admin).ToList();
+    }
+
+    string name = string.Empty;
+}

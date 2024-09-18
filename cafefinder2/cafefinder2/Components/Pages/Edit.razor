@@ -1,0 +1,113 @@
+﻿@page "/Edit/{id}"
+@using System.ComponentModel.DataAnnotations
+@using System.Text
+@using System.Text.Encodings.Web
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.WebUtilities
+@using cafefinder2.Components.Account
+@using cafefinder2.Data
+
+@inject ApplicationDbContext db
+@rendermode InteractiveServer
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+@inject NavigationManager NavigationManage
+
+
+<h3>create</h3>
+
+<InputText @bind-Value="PlaceName.UserName"></InputText>
+<InputText @bind-Value="PlaceName.Name"></InputText>
+<InputText @bind-Value="PlaceName.Addres"></InputText>
+<InputText @bind-Value="PlaceName.Link"></InputText>
+<InputText @bind-Value="PlaceName.LocationLink"></InputText>
+<InputText @bind-Value="PlaceName.WorkTime"></InputText>
+<InputText @bind-Value="PlaceName.PhoneNumber"></InputText>
+<InputText @bind-Value="PlaceName.Email"></InputText>
+<InputText @bind-Value="PlaceName.Neaber"></InputText>
+
+<InputCheckbox @bind-Value="PlaceName.Cafe"></InputCheckbox>
+
+<InputCheckbox @bind-Value="PlaceName.Restaurant"></InputCheckbox>
+
+<InputCheckbox @bind-Value="PlaceName.FreeSmoke"></InputCheckbox>
+
+<InputCheckbox @bind-Value="PlaceName.FreeTime"></InputCheckbox>
+
+<InputCheckbox @bind-Value="PlaceName.BookCafe"></InputCheckbox>
+
+<InputCheckbox @bind-Value="PlaceName.BirthdayTheme"></InputCheckbox>
+
+<InputCheckbox @bind-Value="PlaceName.RoofGarden"></InputCheckbox>
+
+<InputCheckbox @bind-Value="PlaceName.OpenSpace"></InputCheckbox>
+
+<InputFile OnChange="LoadFiles" multiple />
+
+<button type="submit" @onclick="_create"></button>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@code {
+    ApplicationUser PlaceName = new()
+        {
+            Rule = Rule.cafe_admin,
+        };
+    string message = string.Empty;
+    [Parameter]
+    public required string id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        var name = user.Identity?.Name;
+        var User = db.Users.FirstOrDefault(p => p.UserName == name); // مثال برای گرفتن داده‌های یک مکان
+        if (user.Identity!.IsAuthenticated == false || User!.Rule != Rule.Admin)
+            NavigationManage.NavigateTo(NavigationManage.BaseUri + "Account/Login/");
+        PlaceName = db.Users.FirstOrDefault(p => p.Id == id); // مثال برای گرفتن داده‌های یک مکان
+
+        await Task.CompletedTask;
+    }
+
+    public async Task _create()
+    {
+        if (string.IsNullOrWhiteSpace(PlaceName.UserName)) { message = "نام کاربری را وارد کنید"; }
+        if (string.IsNullOrWhiteSpace(PlaceName.Name)) { message = "رمز را وارد کنید"; }
+        if (string.IsNullOrWhiteSpace(PlaceName.Addres)) { message = "رمز را وارد کنید"; }
+        if (string.IsNullOrWhiteSpace(PlaceName.Link)) { message = "رمز را وارد کنید"; }
+        if (string.IsNullOrWhiteSpace(PlaceName.LocationLink)) { message = "رمز را وارد کنید"; }
+        if (string.IsNullOrWhiteSpace(PlaceName.WorkTime)) { message = "رمز را وارد کنید"; }
+        if (string.IsNullOrWhiteSpace(PlaceName.PhoneNumber)) { message = "رمز را وارد کنید"; }
+        if (string.IsNullOrWhiteSpace(PlaceName.Email)) { message = "رمز را وارد کنید"; }
+        if (string.IsNullOrWhiteSpace(PlaceName.Neaber)) { message = "رمز را وارد کنید"; }
+        db.Users.Update(PlaceName);
+        db.SaveChanges();
+    }
+
+
+    private async void LoadFiles(InputFileChangeEventArgs e)
+    {
+        var f = e.File;
+        var m = new MemoryStream((int)f.Size);
+        await f.OpenReadStream().CopyToAsync(m);
+        string s = Encoding.UTF8.GetString(m.ToArray());
+        PlaceName.Photo?.Add(f.Name, s);
+    }
+
+
+}

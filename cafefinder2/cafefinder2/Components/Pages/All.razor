@@ -1,0 +1,121 @@
+﻿@page "/all"
+@inject ApplicationDbContext db
+@rendermode InteractiveServer
+<PageTitle>all</PageTitle>
+
+<h3>all</h3>
+
+
+<section>
+    <div class="content-section">
+
+        <div class="dropdown location-dropdown">
+
+            <select class="form-control" @bind="@_neaber">
+                <option value="همه">همه</option>
+
+                @foreach (var item in Users.DistinctBy(prop => prop.Neaber))
+                {
+
+                    <option value="@item.Neaber">@item.Neaber</option>
+
+                }
+
+            </select>
+
+        </div>
+
+        <label for="cafe">کافی شاپ</label>
+        <input type="checkbox" @bind-value="C" id="cafe" />
+
+        <label for="resturan">رستوران</label>
+        <input type="checkbox" @bind-value="R" id="resturan" />
+
+        <label for="Bookcafe">کافه کتاب</label>
+        <input type="checkbox" @bind-value="Book" id="Bookcafe" />
+
+        <label for="Roof">روف گاردن</label>
+        <input type="checkbox" @bind-value="Roof" id="Roof" />
+
+        <label for="Openspace"> فضای باز</label>
+        <input type="checkbox" @bind-value="Openspace" id="Openspace" />
+
+        <label for="FreeSmoke">فری اسموک</label>
+        <input type="checkbox" @bind-value="FreeSmoke" id="FreeSmoke" />
+
+        <label for="Birthday"> فضای تولد</label>
+        <input type="checkbox" @bind-value="Birthday" id="Birthday" />
+
+
+
+
+    </div>
+</section>
+
+
+<div class="products">
+
+    @foreach (var all in Users.Where(p =>
+    {
+       if (_neaber != "همه") if (!p.Neaber!.Contains(_neaber)) return false;
+       if (R) if (!p.Restaurant) return false;
+        if (C) if (!p.Cafe) return false;
+       if (Book) if (!p.BookCafe) return false;
+       if (Roof) if (!p.RoofGarden) return false;
+       if (Openspace) if (!p.OpenSpace) return false;
+       if (FreeSmoke) if (!p.FreeSmoke) return false;
+       if (Birthday) if (!p.BirthdayTheme) return false;
+        return true;
+    }))
+    {
+        <div class="product-item">
+            <img src="data:image/png;base64,@all.Photo?.FirstOrDefault().Value" />
+            <h3>@all.Name</h3>
+            <p>@all.Neaber</p>
+
+            @{
+                float star = 0;
+                foreach (var _star in all.StarRating?.Select(prop => prop.Value))
+                    star += _star.Value;
+                star = star / all.StarRating.Count;
+                if (float.IsNaN(star)) { star = 0; }
+            }
+            <div class="rating">@star </div>
+            <a asp-page="./Details" asp-route-id="@all.Id">مشاهده</a> |
+        </div>
+
+
+
+    }
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+@code {
+    string _neaber = "همه";
+    bool R = false;
+    bool C = false;
+    bool Book = false;
+    bool Roof = false;
+    bool Openspace = false;
+    bool FreeSmoke = false;
+    bool Birthday = false;
+    List<ApplicationUser> Users;
+    protected override async Task OnInitializedAsync()
+    {
+        Users = db.Users.Where(p => p.Rule == Rule.cafe_admin).ToList();
+    }
+            }
