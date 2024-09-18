@@ -43,7 +43,7 @@
 
 <InputFile OnChange="LoadFiles" multiple />
 
-<button type="submit" @onclick="_create"></button>
+<button type="submit" @onclick="_edit"></button>
 
 
 
@@ -77,14 +77,14 @@
         var user = authstate.User;
         var name = user.Identity?.Name;
         var User = db.Users.FirstOrDefault(p => p.UserName == name); // مثال برای گرفتن داده‌های یک مکان
-        if (user.Identity!.IsAuthenticated == false || User!.Rule != Rule.Admin)
+        if (user.Identity!.IsAuthenticated == true || User!.Rule != Rule.Admin)
             NavigationManage.NavigateTo(NavigationManage.BaseUri + "Account/Login/");
         PlaceName = db.Users.FirstOrDefault(p => p.Id == id); // مثال برای گرفتن داده‌های یک مکان
 
         await Task.CompletedTask;
     }
 
-    public async Task _create()
+    public async Task _edit()
     {
         if (string.IsNullOrWhiteSpace(PlaceName.UserName)) { message = "نام کاربری را وارد کنید"; }
         if (string.IsNullOrWhiteSpace(PlaceName.Name)) { message = "رمز را وارد کنید"; }

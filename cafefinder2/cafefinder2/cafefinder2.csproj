@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Components\Pages\all.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\cafefinder2.ServiceDefaults\cafefinder2.ServiceDefaults.csproj" />
     <ProjectReference Include="..\cafefinder2.Client\cafefinder2.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.8" />
